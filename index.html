@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <style>
-:root{--bg:#0B0E13;--card:#161A20;--card2:#1C2027;--high:#272B33;--line:#2A2F37;--text:#E6E8ED;--muted:#8B949E;--dim:#6E7681;--pri:#3FB950;--pri2:#67DF70;--wash:rgba(63,185,80,.14);--none:#161B22;--miss:#B5615F;--part:#C9A13B;--good:#7BD88F;--all:#1F8F3A}
+:root{--bg:#0B0E13;--card:#161A20;--card2:#1C2027;--high:#272B33;--line:#2A2F37;--text:#E6E8ED;--muted:#8B949E;--dim:#6E7681;--pri:#3FB950;--pri2:#67DF70;--wash:rgba(63,185,80,.14);--none:#161B22;--miss:#B5615F;--part:#A8E6B4;--good:#3FB950;--all:#1F8F3A}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{background:var(--bg);color:var(--text);font:15px/1.4 Inter,-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
 body{min-height:100dvh;overscroll-behavior-y:none}
@@ -25,8 +25,10 @@ h2{font-size:24px;font-weight:700;letter-spacing:-.015em;margin:4px 0 6px}
 .icon{width:44px;height:44px;display:grid;place-items:center;border-radius:50%;color:var(--muted)}
 .label{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:6px}
 .label.g{color:var(--pri2)}
+.label.r{color:#E2A4A2}
 .label svg{width:15px;height:15px}
 .muted{color:var(--muted)}
+.small{font-size:12px}
 .hint{color:var(--dim);font-size:13px;text-align:center;margin-top:10px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;margin-top:12px}
 .row{display:flex;align-items:center;gap:12px}
@@ -87,8 +89,8 @@ h2{font-size:24px;font-weight:700;letter-spacing:-.015em;margin:4px 0 6px}
 .lv-none{background:var(--none);box-shadow:inset 0 0 0 1px var(--line);color:var(--dim)}
 .lv-pending{background:transparent;box-shadow:inset 0 0 0 1.5px var(--muted);color:var(--text)}
 .lv-miss{background:var(--miss);color:#fff}
-.lv-part{background:var(--part);color:#1d1503}
-.lv-good{background:var(--good);color:#06240e}
+.lv-part{background:var(--part);color:#06240e}
+.lv-good{background:var(--good);color:#05200b}
 .lv-all{background:var(--all);color:#fff}
 .lv-future{background:transparent}
 .legend{display:flex;flex-wrap:wrap;gap:8px 12px;margin-top:14px;font-size:11px;color:var(--muted)}
@@ -108,12 +110,26 @@ h2{font-size:24px;font-weight:700;letter-spacing:-.015em;margin:4px 0 6px}
 .bar em{font-style:normal;font-size:12px;font-weight:700}
 .pills{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:12px}
 .pills span{height:36px;border-radius:10px;display:grid;place-items:center;font-size:12px;font-weight:700}
-.gday{font-size:12px;color:var(--muted);font-weight:600;margin-top:12px;text-transform:uppercase;letter-spacing:.06em}
 .dot{width:9px;height:9px;border-radius:50%;flex:none}
 .dot.won{background:var(--pri2)}
-.dot.missed{box-shadow:inset 0 0 0 1.5px var(--dim)}
+.dot.missed{background:var(--miss)}
 .dot.pending{box-shadow:inset 0 0 0 1.5px var(--muted)}
-.insight{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.3)}
+.insight{background:rgba(181,97,95,.07);border-color:rgba(181,97,95,.3)}
+.ins{margin-top:4px}
+.ins li{margin:8px 0 0 18px;line-height:1.45}
+.reasons{display:grid;gap:10px;margin-top:14px}
+.rsn{text-align:left;padding:14px 16px;border-radius:16px;background:var(--card);border:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
+.rsn b{font-size:16px}
+.rsn span{font-size:13px;color:var(--muted)}
+.rsn.on{border-color:var(--miss);background:rgba(181,97,95,.14)}
+.rchip{font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--high);color:var(--muted)}
+.r-excuse{background:rgba(181,97,95,.22);color:#F0C0BE}
+.loss{padding:12px 0;border-bottom:1px solid var(--line)}
+.loss:last-child{border-bottom:0}
+.rrow{display:grid;grid-template-columns:130px 1fr 28px;align-items:center;gap:10px;margin-top:12px;font-size:14px}
+.rrow b{text-align:right}
+.rb{height:8px;background:var(--high);border-radius:99px;overflow:hidden}
+.rb i{display:block;height:100%;border-radius:99px}
 textarea,.txt,input[type=time]{font:inherit;font-size:16px;color:var(--text);background:#21262D;border:1px solid var(--line);border-radius:14px;padding:13px 14px;outline:none;width:100%}
 textarea:focus,.txt:focus,input[type=time]:focus{border-color:var(--pri)}
 textarea{resize:none;margin-top:12px}
@@ -177,6 +193,8 @@ const nextHour=()=>pad(Math.min(23,new Date().getHours()+1))+':00';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 function isoWeek(d){const x=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const day=x.getUTCDay()||7;x.setUTCDate(x.getUTCDate()+4-day);const y0=new Date(Date.UTC(x.getUTCFullYear(),0,1));return Math.ceil(((x-y0)/864e5+1)/7);}
+const RS={excuse:'Excuse',event:'Unplanned event'};
+const reasonTxt=f=>RS[f.reason]||'No reason given';
 
 // icons
 const sv=p=>`<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
@@ -203,24 +221,27 @@ function periodStat(start,end){const t=today();let won=0,res=0,days=0,allDone=0,
  for(let d=new Date(start);d<=end&&d<=t;d=addDays(d,1)){const s=dayStat(ymd(d));if(!s.planned)continue;days++;won+=s.won;res+=s.res;
   if(s.res===s.planned){const p=s.won/s.planned;if(p===1)allDone++;if(best==null||p>best){best=p;bestD=new Date(d);}}}
  return{won,res,days,allDone,best,bestD,pct:res?won/res:null};}
+function lossesIn(a,b){const t=ymd(today()),A=ymd(a),B=ymd(b),L=[];let tot=0;
+ for(const f of db.fights){if(f.date<A||f.date>B||f.date>t)continue;const e=eff(f);if(e==='pending')continue;tot++;if(e==='missed')L.push(f);}
+ L.sort((x,y)=>(y.date+y.time).localeCompare(x.date+x.time));return{L,tot};}
 
 // ui helpers
 const pctTxt=p=>p==null?'·':Math.round(p*100)+'%';
-function ringBox(frac,size,label){const r=15.5,c=2*Math.PI*r;return `<div class="ringbox" style="width:${size}px;height:${size}px"><svg width="${size}" height="${size}" viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="${r}" fill="none" stroke="#272B33" stroke-width="3"/><circle cx="18" cy="18" r="${r}" fill="none" stroke="#67DF70" stroke-width="3" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-Math.max(0,Math.min(1,frac)))}"/></svg><b>${label}</b></div>`;}
+function ringBox(frac,size,label,color){const r=15.5,c=2*Math.PI*r;return `<div class="ringbox" style="width:${size}px;height:${size}px"><svg width="${size}" height="${size}" viewBox="0 0 36 36" style="transform:rotate(-90deg)"><circle cx="18" cy="18" r="${r}" fill="none" stroke="#272B33" stroke-width="3"/><circle cx="18" cy="18" r="${r}" fill="none" stroke="${color||'#67DF70'}" stroke-width="3" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-Math.max(0,Math.min(1,frac)))}"/></svg><b>${label}</b></div>`;}
 function chip(cur,prev,lbl){if(cur==null)return'';if(prev==null)return `<span class="chip flat">No data ${lbl}</span>`;const d=Math.round((cur-prev)*100);const cls=d>0?'up':d<0?'down':'flat';return `<span class="chip ${cls}">${d>0?'+':''}${d} pts ${lbl}</span>`;}
-const legend=()=>`<div class="legend">${[['none','No plan'],['miss','Missed'],['part','Partial'],['good','Good'],['all','All done']].map(([k,l])=>`<span><i class="lv-${k}"></i>${l}</span>`).join('')}</div>`;
+const legend=()=>`<div class="legend">${[['none','No plan'],['miss','Missed'],['part','Some'],['good','Most'],['all','All done']].map(([k,l])=>`<span><i class="lv-${k}"></i>${l}</span>`).join('')}</div>`;
 const gear=`<button class="icon" data-act="settings" aria-label="Settings">${I.gear}</button>`;
 function summary(lbl,p,ch,sub){return `<div class="card row between"><div><div class="label">${lbl}</div><div class="huge">${pctTxt(p)}</div>${ch}<p class="muted" style="margin-top:8px;font-size:13px">${sub}</p></div>${ringBox(p||0,76,'')}</div>`;}
 const small=(l,v,s)=>`<div class="card" style="margin-top:12px"><div class="label">${l}</div><div class="sv">${v}</div><p class="muted" style="font-size:13px">${s}</p></div>`;
 
 // state
-const st={tab:'fight',map:'week',wk:0,mo:0,rv:0};
+const st={tab:'fight',map:'week',wk:0,mo:0,rv:0,rs:'week'};
 let after=null;
 
 // FIGHT
 function fightCard(f){const e=eff(f);
  if(e==='won')return `<div class="card fight done"><div class="row between"><div><div class="time">${f.time}</div><div class="ft">${esc(f.text)}</div><div class="ok">${I.check} Won${f.doneAt?' at '+f.doneAt:''}</div></div><button class="circle" data-undo="${f.id}" aria-label="Undo">${I.check}</button></div></div>`;
- if(e==='missed')return `<div class="card fight miss"><div class="row between"><div><div class="time">${f.time}</div><div class="ft">${esc(f.text)}</div><div class="nt">Not today${f.note?' · '+esc(f.note):''}</div></div><button class="link" data-undo="${f.id}">Undo</button></div></div>`;
+ if(e==='missed')return `<div class="card fight miss"><div class="row between"><div><div class="time">${f.time}</div><div class="ft">${esc(f.text)}</div><div class="nt">Not today · ${reasonTxt(f)}${f.note?' · '+esc(f.note):''}</div></div><button class="link" data-undo="${f.id}">Undo</button></div></div>`;
  return `<div class="card fight"><div class="time">${f.time}</div><div class="ft">${esc(f.text)}</div><div class="two"><button class="btn quiet" data-miss="${f.id}">${I.x} Not today</button><button class="btn pri" data-won="${f.id}">${I.check} Won</button></div></div>`;}
 function viewFight(){const t=today(),ts=ymd(t),tom=ymd(addDays(t,1));const fs=fightsOn(ts),s=dayStat(ts);
  const focus=(db.reviews[ymd(mondayOf(t))]||{}).focus;
@@ -272,44 +293,63 @@ function sixView(){const t=today(),start=addDays(mondayOf(t),-7*25);let cells=''
  ${summary('Average won',ps.pct,trend,`${ps.won} of ${ps.res} fights won`)}
  <div class="card"><div class="label">% won per month</div><div class="bars">${months.map(m=>`<div class="bar"><em>${m.p==null?'·':Math.round(m.p*100)}</em><div class="bt"><div class="bv lv-${lvlPct(m.p)}" style="height:${m.p==null?4:Math.max(6,m.p*100)}%"></div></div><span>${m.l}</span></div>`).join('')}</div></div>`;}
 
-// REVIEW
-function insight(endD){const t=today(),end=endD>t?t:endD,start=addDays(end,-27);
- const small2=[],big=[],am=[0,0],pm=[0,0],wd=Array.from({length:7},()=>[0,0]);let days=0;
- for(let d=new Date(start);d<=end;d=addDays(d,1)){const ds=ymd(d),s=dayStat(ds);if(!s.planned||s.pending)continue;days++;
-  (s.planned>=3?big:small2).push(s.won/s.planned);const w=dowIdx(d);wd[w][0]+=s.won;wd[w][1]+=s.planned;
-  for(const f of fightsOn(ds)){const hr=+f.time.slice(0,2),b=hr<12?am:hr>=17?pm:null;if(b){b[1]++;if(eff(f)==='won')b[0]++;}}}
- if(days<5)return'Keep logging. Patterns show up after a week or two of fights.';
- const avg=a=>a.reduce((x,y)=>x+y,0)/a.length,P=x=>Math.round(x*100)+'%';
- if(big.length>=2&&small2.length>=2){const a=avg(small2),b=avg(big);if(a-b>=.15)return `You win ${P(a)} on days with 1 or 2 fights, and ${P(b)} on days with 3. Try 2 next week.`;}
- if(am[1]>=3&&pm[1]>=3){const a=am[0]/am[1],b=pm[0]/pm[1];if(Math.abs(a-b)>=.2)return a>b?`Morning fights win ${P(a)}, evening ones ${P(b)}. Put the hard one earlier in the day.`:`Evening fights win ${P(b)}, morning ones ${P(a)}. Plan the hard one for the evening.`;}
- const all=wd.reduce((s,x)=>[s[0]+x[0],s[1]+x[1]],[0,0]),overall=all[0]/all[1];let worst=-1,wp=1;
- wd.forEach((x,i)=>{if(x[1]>=3){const p=x[0]/x[1];if(p<wp){wp=p;worst=i;}}});
- if(worst>=0&&overall-wp>=.2)return `${DOWL[worst]}s are your hardest day (${P(wp)} won). Plan a smaller fight then.`;
- return overall>=.7?'Strong run. Keep each fight small, specific and timed.':'Steady. Make each fight smaller and give it an exact time.';}
-function viewReview(){const t=today(),ws=addDays(mondayOf(t),7*st.rv),we=addDays(ws,6),key=ymd(ws),nk=ymd(addDays(ws,7));
- const cur=periodStat(ws,we),prev=periodStat(addDays(ws,-7),addDays(ws,-1));const r=db.reviews[key]||{},nr=db.reviews[nk]||{};
- let pills='',list='';
- for(let i=0;i<7;i++){const d=addDays(ws,i),ds=ymd(d),s=dayStat(ds);pills+=`<span class="lv-${lvl(s)}">${DOW[i][0]}</span>`;
-  const fs=fightsOn(ds);if(fs.length)list+=`<div class="gday">${fmtDay(d)}</div>`+fs.map(f=>`<div class="li"><span class="dot ${eff(f)}"></span><span class="t">${f.time}</span><span class="${eff(f)==='missed'?'muted':''}">${esc(f.text)}</span></div>`).join('');}
+// REVIEW: only what went wrong
+function lossInsights(endD){const t=today(),end=endD>t?t:endD,start=addDays(end,-27);
+ let lost=0,exc=0,evt=0,tot=0;const tb={Morning:[0,0],Afternoon:[0,0],Evening:[0,0]},wd=Array.from({length:7},()=>[0,0]);
+ for(let d=new Date(start);d<=end;d=addDays(d,1)){const ds=ymd(d);for(const f of fightsOn(ds)){const e=eff(f);if(e==='pending')continue;tot++;
+  const h=+f.time.slice(0,2),k=h<12?'Morning':h<17?'Afternoon':'Evening';tb[k][1]++;const w=dowIdx(d);wd[w][1]++;
+  if(e==='missed'){lost++;tb[k][0]++;wd[w][0]++;if(f.reason==='excuse')exc++;else if(f.reason==='event')evt++;}}}
+ if(tot<5)return['Keep logging. Patterns show up after one or two weeks of fights.'];
+ if(!lost)return['No losses in the last 4 weeks. Make the next fight a little harder.'];
+ const out=[],P=x=>Math.round(x*100)+'%';
+ if(exc+evt>0){const sh=exc/(exc+evt);
+  if(sh>=.6)out.push(`${P(sh)} of your explained losses were excuses, not events. That part is fully in your control.`);
+  else if(sh<=.3)out.push('Most losses came from unplanned events. Give each fight a backup time.');
+  else out.push(`Excuses and real events are mixed (${exc} vs ${evt}). Read the notes below and be honest which is which.`);}
+ let wk=null,wr=0;for(const k in tb){const[l,n]=tb[k];if(n>=3&&l/n>wr){wr=l/n;wk=k;}}
+ if(wk&&wr>=.4)out.push(`You lose ${P(wr)} of your ${wk.toLowerCase()} fights. Move the hardest one to another part of the day.`);
+ let wi=-1,wp=0;wd.forEach(([l,n],i)=>{if(n>=3&&l/n>wp){wp=l/n;wi=i;}});
+ if(wi>=0&&wp>=.5)out.push(`${DOWL[wi]} is your weakest day (${P(wp)} lost). Plan one small fight only on that day.`);
+ if(out.length<2)out.push('Look at the notes below. What do the hard moments have in common?');
+ return out.slice(0,3);}
+function viewReview(){const t=today(),all=st.rs==='all';
+ const ws=addDays(mondayOf(t),7*st.rv),we=addDays(ws,6),key=ymd(ws),nk=ymd(addDays(mondayOf(t),7));
+ const r=db.reviews[key]||{},nr=db.reviews[nk]||{};
+ const cur=all?lossesIn(new Date(2000,0,1),t):lossesIn(ws,we),prev=lossesIn(addDays(ws,-7),addDays(ws,-1));
+ const exc=cur.L.filter(f=>f.reason==='excuse').length,evt=cur.L.filter(f=>f.reason==='event').length,non=cur.L.length-exc-evt;
+ const lp=cur.tot?cur.L.length/cur.tot:null,pp=prev.tot?prev.L.length/prev.tot:null;
+ let ch='';if(!all&&lp!=null&&pp!=null){const d=Math.round((lp-pp)*100);ch=`<span class="chip ${d<0?'up':d>0?'down':'flat'}">${d>0?'+':''}${d} pts vs last week</span>`;}
+ let pills='';if(!all)for(let i=0;i<7;i++){const d=addDays(ws,i),s=dayStat(ymd(d));pills+=`<span class="lv-${lvl(s)}">${DOW[i][0]}</span>`;}
+ const n=cur.L.length||1;
+ const rr=(l,v,c)=>`<div class="rrow"><span>${l}</span><div class="rb"><i style="width:${Math.round(v/n*100)}%;background:${c}"></i></div><b>${v}</b></div>`;
+ const items=cur.L.slice(0,150).map(f=>`<div class="loss"><div class="row"><span class="t" style="color:#E2A4A2">${f.time}</span><b style="font-weight:600">${esc(f.text)}</b></div><div class="row" style="margin-top:6px;gap:8px"><span class="rchip r-${f.reason||'none'}">${reasonTxt(f)}</span><span class="muted small">${fmtDay(parse(f.date))}</span></div>${f.note?`<p class="nt">"${esc(f.note)}"</p>`:''}</div>`).join('');
  after=()=>{const pa=$('#pattern');if(pa)pa.oninput=()=>{(db.reviews[key]=db.reviews[key]||{}).pattern=pa.value;save();};
   const fb=$('#setfocus');if(fb)fb.onclick=()=>{const v=$('#focus').value.trim();(db.reviews[nk]=db.reviews[nk]||{}).focus=v;save();toast(v?'Focus set for next week':'Focus cleared');};};
  return `<header class="top"><h1>Review</h1>${gear}</header>
- <div class="card"><div class="nav" style="margin:0"><div><div class="label">${st.rv===0?'This week':'Week '+isoWeek(ws)}</div><div class="title">${ws.getDate()} ${MON[ws.getMonth()]} to ${we.getDate()} ${MON[we.getMonth()]}</div></div><div class="arrows"><button data-nav="rv,-1">${I.left}</button><button data-nav="rv,1" ${st.rv>=0?'disabled':''}>${I.right}</button></div></div><div class="pills">${pills}</div></div>
- ${r.focus?`<div class="card focus"><div class="label g">Focus this week</div><p>${esc(r.focus)}</p></div>`:''}
- ${summary('Score',cur.pct,chip(cur.pct,prev.pct,'vs last week'),`${cur.won} of ${cur.res} fights won`)}
- <div class="card"><div class="label">Fights</div>${list||'<p class="muted" style="margin-top:8px">No fights this week yet.</p>'}</div>
- <div class="card"><div class="label">What pattern do you see?</div><textarea id="pattern" rows="3" placeholder="One honest sentence">${esc(r.pattern||'')}</textarea></div>
- <div class="card insight"><div class="label g">Insight</div><p style="margin-top:6px">${insight(we)}</p></div>
- <div class="card"><div class="label">Focus for next week</div><textarea id="focus" rows="2" placeholder="If I feel the urge to leave, then I stay and ask one question.">${esc(nr.focus||'')}</textarea><button class="btn pri" id="setfocus">Set next week</button></div>`;}
+ <div class="seg">${[['week','Week'],['all','All time']].map(([k,l])=>`<button class="${st.rs===k?'on':''}" data-rseg="${k}">${l}</button>`).join('')}</div>
+ ${all?'':`<div class="card"><div class="nav" style="margin:0"><div><div class="label">${st.rv===0?'This week':'Week '+isoWeek(ws)}</div><div class="title">${ws.getDate()} ${MON[ws.getMonth()]} to ${we.getDate()} ${MON[we.getMonth()]}</div></div><div class="arrows"><button data-nav="rv,-1">${I.left}</button><button data-nav="rv,1" ${st.rv>=0?'disabled':''}>${I.right}</button></div></div><div class="pills">${pills}</div></div>`}
+ <div class="card row between"><div><div class="label r">${all?'Lost, all time':'Lost this week'}</div><div class="huge">${pctTxt(lp)}</div>${ch}<p class="muted" style="margin-top:8px;font-size:13px">${cur.L.length} of ${cur.tot} fights lost</p></div>${ringBox(lp||0,76,'','#B5615F')}</div>
+ <div class="card"><div class="label">Why you lost</div>${cur.L.length?rr('Excuse',exc,'var(--miss)')+rr('Unplanned event',evt,'#8B949E')+(non?rr('No reason given',non,'#3A3F47'):''):'<p class="muted" style="margin-top:8px">Nothing lost here.</p>'}</div>
+ <div class="card insight"><div class="label r">What the pattern says</div><ul class="ins">${lossInsights(all?t:we).map(x=>`<li>${x}</li>`).join('')}</ul></div>
+ <div class="card"><div class="label">${all?'Every loss and your notes':'Losses and your notes'}</div>${items||'<p class="muted" style="margin-top:8px">No losses here. Keep your fights honest and small.</p>'}</div>
+ ${all?'':`<div class="card"><div class="label">What pattern do you see?</div><textarea id="pattern" rows="3" placeholder="One honest sentence about why you lost">${esc(r.pattern||'')}</textarea></div>
+ <div class="card"><div class="label g">One change for next week</div><textarea id="focus" rows="2" placeholder="If I feel the urge to escape, then I stay and do 10 minutes.">${esc(nr.focus||'')}</textarea><button class="btn pri" id="setfocus">Set next week</button></div>`}`;}
 
 // SHEETS
 function openSheet(html){$('#sheet').innerHTML='<div class="handle"></div>'+html;$('#sw').classList.add('open');}
 function closeSheet(){$('#sw').classList.remove('open');}
 $('#sw').addEventListener('click',e=>{if(e.target.id==='sw')closeSheet();});
-function setStatus(id,status,note){const f=db.fights.find(x=>x.id===id);if(!f)return;f.status=status;f.doneAt=(status==='won'&&f.date===ymd(today()))?nowHM():null;if(note!==undefined)f.note=note;save();}
-function openMiss(id){openSheet(`<div class="label g">Awareness log</div><h2>Noticing counts.</h2><p class="muted">What made it hard? One line is enough.</p><textarea id="note" rows="3" maxlength="140" placeholder="Optional"></textarea><button class="btn pri" id="svn">Save</button><button class="btn ghost" id="skn">Skip</button>`);
- $('#svn').onclick=()=>{setStatus(id,'missed',$('#note').value.trim());closeSheet();render();};
- $('#skn').onclick=()=>{setStatus(id,'missed','');closeSheet();render();};}
+function setStatus(id,status,note,reason){const f=db.fights.find(x=>x.id===id);if(!f)return;f.status=status;f.doneAt=(status==='won'&&f.date===ymd(today()))?nowHM():null;
+ if(note!==undefined)f.note=note;f.reason=status==='missed'?(reason!==undefined?reason:(f.reason||null)):null;save();}
+function openMiss(id){let reason=null;
+ openSheet(`<div class="label r">Not today</div><h2>Noticing counts.</h2><p class="muted">Be honest. Why not today?</p>
+ <div class="reasons"><button class="rsn" data-r="excuse"><b>Excuse</b><span>I chose comfort over the fight</span></button><button class="rsn" data-r="event"><b>Unplanned important event</b><span>Something real and important came up</span></button></div>
+ <textarea id="note" rows="2" maxlength="140" placeholder="What exactly happened? (optional)"></textarea>
+ <button class="btn pri" id="svn" disabled>Save</button><button class="btn ghost" id="cxn">Cancel</button>`);
+ const sh=$('#sheet');
+ sh.querySelectorAll('.rsn').forEach(b=>b.onclick=()=>{reason=b.dataset.r;sh.querySelectorAll('.rsn').forEach(x=>x.classList.toggle('on',x===b));$('#svn').disabled=false;});
+ $('#svn').onclick=()=>{if(!reason)return;setStatus(id,'missed',$('#note').value.trim(),reason);closeSheet();render();toast('Logged. It will show in Review.');};
+ $('#cxn').onclick=closeSheet;}
 function openPlanner(ds){const t=today(),isTom=ds===ymd(addDays(t,1)),isToday=ds===ymd(t);
  const locked=fightsOn(ds).filter(f=>f.status!=='pending'),max=3-locked.length;
  if(max<=0){toast('This day already has 3 fights');return;}
@@ -332,12 +372,12 @@ function openPlanner(ds){const t=today(),isTom=ds===ymd(addDays(t,1)),isToday=ds
   $('#cancel').onclick=closeSheet;
   $('#commit').onclick=()=>{const ok=rows.filter(r=>r.text.trim());if(!ok.length){toast('Write at least one fight');return;}
    db.fights=db.fights.filter(f=>!(f.date===ds&&f.status==='pending'));
-   ok.forEach(r=>db.fights.push({id:uid(),date:ds,time:r.time||'09:00',text:r.text.trim(),status:'pending',doneAt:null,note:''}));
+   ok.forEach(r=>db.fights.push({id:uid(),date:ds,time:r.time||'09:00',text:r.text.trim(),status:'pending',doneAt:null,note:'',reason:null}));
    save();closeSheet();render();toast(isTom?'Committed. Rest well.':'Committed.');};};
  draw();}
 function openDay(ds){const d=parse(ds),fs=fightsOn(ds),s=dayStat(ds),t=today(),canLog=d<=t;
  let h=`<div class="label">${DOWL[dowIdx(d)]} ${d.getDate()} ${MONL[d.getMonth()]} ${d.getFullYear()}</div><h2>${s.planned?Math.round(s.won/s.planned*100)+'%, '+s.won+' of '+s.planned+' won':'No fights planned'}</h2>`;
- h+=fs.map(f=>{const e=eff(f);return `<div class="li2"><div class="row"><span class="dot ${e}"></span><span class="t">${f.time}</span><span>${esc(f.text)}</span></div>${f.note?`<p class="nt">${esc(f.note)}</p>`:''}${canLog?`<div class="mini"><button class="${e==='won'?'on':''}" data-set="${f.id}|won|${ds}">Won</button><button class="${e==='missed'?'onm':''}" data-set="${f.id}|missed|${ds}">Not today</button></div>`:''}</div>`;}).join('');
+ h+=fs.map(f=>{const e=eff(f);return `<div class="li2"><div class="row"><span class="dot ${e}"></span><span class="t">${f.time}</span><span>${esc(f.text)}</span></div>${e==='missed'?`<p class="nt">${reasonTxt(f)}${f.note?': '+esc(f.note):''}</p>`:''}${canLog?`<div class="mini"><button class="${e==='won'?'on':''}" data-set="${f.id}|won|${ds}">Won</button><button class="${e==='missed'?'onm':''}" data-set="${f.id}|missed|${ds}">Not today</button></div>`:''}</div>`;}).join('');
  if(ds>=ymd(t)&&fs.length<3)h+=`<button class="btn quiet" data-plan="${ds}">${fs.length?'Edit plan':'Plan this day'}</button>`;
  openSheet(h);}
 function openSettings(){const hasDemo=db.fights.some(f=>f.demo);
@@ -349,21 +389,21 @@ function openSettings(){const hasDemo=db.fights.some(f=>f.demo);
  <button class="lrow danger" data-act="wipe">Erase all data</button>
  <p class="hint">Your data lives only on this phone. Back up now and then.</p>
  <p class="hint">Install on iPhone: open in Safari, tap Share, then Add to Home Screen.</p>
- <p class="hint">Face It v1.0</p>`);}
+ <p class="hint">Face It v1.1</p>`);}
 
 // actions
 async function shareFile(name,text,type){const file=new File([text],name,{type});
  if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:name});return;}catch(e){if(e.name==='AbortError')return;}}
  const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1500);}
-function demo(){const t=today(),texts=['Run 5 km','Prepare 2 interview cases','No cigarette today','Speak up in the meeting','Gym session','Call instead of email','Stay until the meeting ends','Ask one question'],times=['06:30','13:00','19:00'];
+function demo(){const t=today(),texts=['Run 5 km','Prepare 2 interview cases','No cigarette today','Speak up in the meeting','Gym session','Call instead of email','Stay until the meeting ends','Ask one question'],times=['06:30','13:00','19:00'],notes=['Too tired, stayed on the couch','Meeting ran late','Scrolled my phone instead','Family dinner came up','Felt anxious and postponed',''];
  for(let i=180;i>=1;i--){if(Math.random()<.15)continue;const d=addDays(t,-i),n=1+Math.floor(Math.random()*3),prog=1-i/180;
-  for(let k=0;k<n;k++){const won=Math.random()<(.4+.45*prog-(n===3?.12:0));db.fights.push({id:uid(),date:ymd(d),time:times[k],text:texts[Math.floor(Math.random()*texts.length)],status:won?'won':'missed',doneAt:null,note:'',demo:true});}}
+  for(let k=0;k<n;k++){const won=Math.random()<(.4+.45*prog-(n===3?.12:0));db.fights.push({id:uid(),date:ymd(d),time:times[k],text:texts[Math.floor(Math.random()*texts.length)],status:won?'won':'missed',doneAt:null,note:won?'':notes[Math.floor(Math.random()*notes.length)],reason:won?null:(Math.random()<.65?'excuse':'event'),demo:true});}}
  save();}
 function doAct(a){
  if(a==='settings')return openSettings();
  if(a==='exp-json')return shareFile('face-it-backup-'+ymd(today())+'.json',JSON.stringify(db,null,1),'application/json');
  if(a==='imp-json')return $('#imp').click();
- if(a==='exp-csv'){const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const rows=[['date','time','fight','status','won_at','note']].concat(db.fights.slice().sort((x,y)=>(x.date+x.time).localeCompare(y.date+y.time)).map(f=>[f.date,f.time,f.text,eff(f),f.doneAt||'',f.note||'']));return shareFile('face-it-'+ymd(today())+'.csv',rows.map(r=>r.map(q).join(',')).join('\n'),'text/csv');}
+ if(a==='exp-csv'){const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const rows=[['date','time','fight','status','reason','won_at','note']].concat(db.fights.slice().sort((x,y)=>(x.date+x.time).localeCompare(y.date+y.time)).map(f=>[f.date,f.time,f.text,eff(f),eff(f)==='missed'?reasonTxt(f):'',f.doneAt||'',f.note||'']));return shareFile('face-it-'+ymd(today())+'.csv',rows.map(r=>r.map(q).join(',')).join('\n'),'text/csv');}
  if(a==='demo'){if(confirm('Add 6 months of sample data to preview the app? You can remove it later in Settings.')){demo();closeSheet();render();toast('Sample data loaded');}return;}
  if(a==='undemo'){db.fights=db.fights.filter(f=>!f.demo);save();closeSheet();render();toast('Sample data removed');return;}
  if(a==='wipe'){if(confirm('Erase all fights and reviews? This cannot be undone.')){db={fights:[],reviews:{}};save();closeSheet();render();toast('All data erased');}return;}}
@@ -371,16 +411,17 @@ $('#imp').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;c
  r.onload=()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d.fights))throw 0;db={fights:d.fights,reviews:d.reviews||{}};save();closeSheet();render();toast('Backup restored');}catch(err){toast('That file is not a Face It backup');}e.target.value='';};
  r.readAsText(f);});
 
-document.addEventListener('click',e=>{const b=e.target.closest('[data-tab],[data-won],[data-miss],[data-undo],[data-plan],[data-seg],[data-nav],[data-day],[data-act],[data-set]');if(!b||b.disabled)return;const d=b.dataset;
+document.addEventListener('click',e=>{const b=e.target.closest('[data-tab],[data-won],[data-miss],[data-undo],[data-plan],[data-seg],[data-rseg],[data-nav],[data-day],[data-act],[data-set]');if(!b||b.disabled)return;const d=b.dataset;
  if(d.tab){st.tab=d.tab;render();window.scrollTo(0,0);return;}
  if(d.won){setStatus(d.won,'won');if(navigator.vibrate)navigator.vibrate(12);render();toast('Won. You kept your word.');return;}
  if(d.miss)return openMiss(d.miss);
  if(d.undo){setStatus(d.undo,'pending','');render();return;}
  if(d.plan)return openPlanner(d.plan);
  if(d.seg){st.map=d.seg;render();return;}
+ if(d.rseg){st.rs=d.rseg;render();return;}
  if(d.nav){const[k,v]=d.nav.split(',');st[k]=Math.min(0,st[k]+Number(v));render();return;}
  if(d.day)return openDay(d.day);
- if(d.set){const[id,s,ds]=d.set.split('|');setStatus(id,s);openDay(ds);render();return;}
+ if(d.set){const[id,s,ds]=d.set.split('|');if(s==='missed')return openMiss(id);setStatus(id,s);openDay(ds);render();return;}
  if(d.act)doAct(d.act);});
 
 function toast(m){let el=$('#toast');if(!el){el=document.createElement('div');el.id='toast';document.body.appendChild(el);}el.textContent=m;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),1900);}
