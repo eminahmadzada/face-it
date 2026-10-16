@@ -294,13 +294,13 @@ function sixView(){const t=today(),start=addDays(mondayOf(t),-7*25);let cells=''
  <div class="card"><div class="label">% won per month</div><div class="bars">${months.map(m=>`<div class="bar"><em>${m.p==null?'·':Math.round(m.p*100)}</em><div class="bt"><div class="bv lv-${lvlPct(m.p)}" style="height:${m.p==null?4:Math.max(6,m.p*100)}%"></div></div><span>${m.l}</span></div>`).join('')}</div></div>`;}
 
 // REVIEW: only what went wrong
-function lossInsights(endD){const t=today(),end=endD>t?t:endD,start=addDays(end,-27);
+function lossInsights(start,end){
  let lost=0,exc=0,evt=0,tot=0;const tb={Morning:[0,0],Afternoon:[0,0],Evening:[0,0]},wd=Array.from({length:7},()=>[0,0]);
  for(let d=new Date(start);d<=end;d=addDays(d,1)){const ds=ymd(d);for(const f of fightsOn(ds)){const e=eff(f);if(e==='pending')continue;tot++;
   const h=+f.time.slice(0,2),k=h<12?'Morning':h<17?'Afternoon':'Evening';tb[k][1]++;const w=dowIdx(d);wd[w][1]++;
   if(e==='missed'){lost++;tb[k][0]++;wd[w][0]++;if(f.reason==='excuse')exc++;else if(f.reason==='event')evt++;}}}
  if(tot<5)return['Keep logging. Patterns show up after one or two weeks of fights.'];
- if(!lost)return['No losses in the last 4 weeks. Make the next fight a little harder.'];
+ if(!lost)return['No losses yet. Make the next fight a little harder.'];
  const out=[],P=x=>Math.round(x*100)+'%';
  if(exc+evt>0){const sh=exc/(exc+evt);
   if(sh>=.6)out.push(`${P(sh)} of your explained losses were excuses, not events. That part is fully in your control.`);
@@ -312,28 +312,18 @@ function lossInsights(endD){const t=today(),end=endD>t?t:endD,start=addDays(end,
  if(wi>=0&&wp>=.5)out.push(`${DOWL[wi]} is your weakest day (${P(wp)} lost). Plan one small fight only on that day.`);
  if(out.length<2)out.push('Look at the notes below. What do the hard moments have in common?');
  return out.slice(0,3);}
-function viewReview(){const t=today(),all=st.rs==='all';
- const ws=addDays(mondayOf(t),7*st.rv),we=addDays(ws,6),key=ymd(ws),nk=ymd(addDays(mondayOf(t),7));
- const r=db.reviews[key]||{},nr=db.reviews[nk]||{};
- const cur=all?lossesIn(new Date(2000,0,1),t):lossesIn(ws,we),prev=lossesIn(addDays(ws,-7),addDays(ws,-1));
+function viewReview(){const t=today();
+ const first=db.fights.length?db.fights.reduce((m,f)=>f.date<m?f.date:m,ymd(t)):ymd(t);
+ const cur=lossesIn(parse(first),t);
  const exc=cur.L.filter(f=>f.reason==='excuse').length,evt=cur.L.filter(f=>f.reason==='event').length,non=cur.L.length-exc-evt;
- const lp=cur.tot?cur.L.length/cur.tot:null,pp=prev.tot?prev.L.length/prev.tot:null;
- let ch='';if(!all&&lp!=null&&pp!=null){const d=Math.round((lp-pp)*100);ch=`<span class="chip ${d<0?'up':d>0?'down':'flat'}">${d>0?'+':''}${d} pts vs last week</span>`;}
- let pills='';if(!all)for(let i=0;i<7;i++){const d=addDays(ws,i),s=dayStat(ymd(d));pills+=`<span class="lv-${lvl(s)}">${DOW[i][0]}</span>`;}
- const n=cur.L.length||1;
+ const lp=cur.tot?cur.L.length/cur.tot:null,n=cur.L.length||1;
  const rr=(l,v,c)=>`<div class="rrow"><span>${l}</span><div class="rb"><i style="width:${Math.round(v/n*100)}%;background:${c}"></i></div><b>${v}</b></div>`;
- const items=cur.L.slice(0,150).map(f=>`<div class="loss"><div class="row"><span class="t" style="color:#E2A4A2">${f.time}</span><b style="font-weight:600">${esc(f.text)}</b></div><div class="row" style="margin-top:6px;gap:8px"><span class="rchip r-${f.reason||'none'}">${reasonTxt(f)}</span><span class="muted small">${fmtDay(parse(f.date))}</span></div>${f.note?`<p class="nt">"${esc(f.note)}"</p>`:''}</div>`).join('');
- after=()=>{const pa=$('#pattern');if(pa)pa.oninput=()=>{(db.reviews[key]=db.reviews[key]||{}).pattern=pa.value;save();};
-  const fb=$('#setfocus');if(fb)fb.onclick=()=>{const v=$('#focus').value.trim();(db.reviews[nk]=db.reviews[nk]||{}).focus=v;save();toast(v?'Focus set for next week':'Focus cleared');};};
+ const items=cur.L.slice(0,200).map(f=>`<div class="loss"><div class="row"><span class="t" style="color:#E2A4A2">${f.time}</span><b style="font-weight:600">${esc(f.text)}</b></div><div class="row" style="margin-top:6px;gap:8px"><span class="rchip r-${f.reason||'none'}">${reasonTxt(f)}</span><span class="muted small">${fmtDay(parse(f.date))}</span></div>${f.note?`<p class="nt">"${esc(f.note)}"</p>`:''}</div>`).join('');
  return `<header class="top"><h1>Review</h1>${gear}</header>
- <div class="seg">${[['week','Week'],['all','All time']].map(([k,l])=>`<button class="${st.rs===k?'on':''}" data-rseg="${k}">${l}</button>`).join('')}</div>
- ${all?'':`<div class="card"><div class="nav" style="margin:0"><div><div class="label">${st.rv===0?'This week':'Week '+isoWeek(ws)}</div><div class="title">${ws.getDate()} ${MON[ws.getMonth()]} to ${we.getDate()} ${MON[we.getMonth()]}</div></div><div class="arrows"><button data-nav="rv,-1">${I.left}</button><button data-nav="rv,1" ${st.rv>=0?'disabled':''}>${I.right}</button></div></div><div class="pills">${pills}</div></div>`}
- <div class="card row between"><div><div class="label r">${all?'Lost, all time':'Lost this week'}</div><div class="huge">${pctTxt(lp)}</div>${ch}<p class="muted" style="margin-top:8px;font-size:13px">${cur.L.length} of ${cur.tot} fights lost</p></div>${ringBox(lp||0,76,'','#B5615F')}</div>
- <div class="card"><div class="label">Why you lost</div>${cur.L.length?rr('Excuse',exc,'var(--miss)')+rr('Unplanned event',evt,'#8B949E')+(non?rr('No reason given',non,'#3A3F47'):''):'<p class="muted" style="margin-top:8px">Nothing lost here.</p>'}</div>
- <div class="card insight"><div class="label r">What the pattern says</div><ul class="ins">${lossInsights(all?t:we).map(x=>`<li>${x}</li>`).join('')}</ul></div>
- <div class="card"><div class="label">${all?'Every loss and your notes':'Losses and your notes'}</div>${items||'<p class="muted" style="margin-top:8px">No losses here. Keep your fights honest and small.</p>'}</div>
- ${all?'':`<div class="card"><div class="label">What pattern do you see?</div><textarea id="pattern" rows="3" placeholder="One honest sentence about why you lost">${esc(r.pattern||'')}</textarea></div>
- <div class="card"><div class="label g">One change for next week</div><textarea id="focus" rows="2" placeholder="If I feel the urge to escape, then I stay and do 10 minutes.">${esc(nr.focus||'')}</textarea><button class="btn pri" id="setfocus">Set next week</button></div>`}`;}
+ <div class="card row between"><div><div class="label r">Lost, all time</div><div class="huge">${pctTxt(lp)}</div><p class="muted" style="margin-top:8px;font-size:13px">${cur.L.length} of ${cur.tot} fights lost</p></div>${ringBox(lp||0,76,'','#B5615F')}</div>
+ <div class="card"><div class="label">Why you lost</div>${cur.L.length?rr('Excuse',exc,'var(--miss)')+rr('Unplanned event',evt,'#8B949E')+(non?rr('No reason given',non,'#3A3F47'):''):'<p class="muted" style="margin-top:8px">Nothing lost yet.</p>'}</div>
+ <div class="card insight"><div class="label r">What the pattern says</div><ul class="ins">${lossInsights(parse(first),t).map(x=>`<li>${x}</li>`).join('')}</ul></div>
+ <div class="card"><div class="label">Every loss and your notes</div>${items||'<p class="muted" style="margin-top:8px">No losses yet.</p>'}</div>`;}
 
 // SHEETS
 function openSheet(html){$('#sheet').innerHTML='<div class="handle"></div>'+html;$('#sw').classList.add('open');}
@@ -389,7 +379,7 @@ function openSettings(){const hasDemo=db.fights.some(f=>f.demo);
  <button class="lrow danger" data-act="wipe">Erase all data</button>
  <p class="hint">Your data lives only on this phone. Back up now and then.</p>
  <p class="hint">Install on iPhone: open in Safari, tap Share, then Add to Home Screen.</p>
- <p class="hint">Face It v1.1</p>`);}
+ <p class="hint">Face It v1.2</p>`);}
 
 // actions
 async function shareFile(name,text,type){const file=new File([text],name,{type});
