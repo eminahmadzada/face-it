@@ -1,8 +1,9 @@
 // Face It for Mac.
-// One line on your desktop, behind your windows, changing every 10 seconds.
-// Menu bar icon: position, text size, quit.
+// One quote on your desktop, behind your windows, changing every 10 seconds.
+// Drag it anywhere. Click it for the next quote. Menu bar icon: font, size, quit.
 import SwiftUI
 import AppKit
+import CoreText
 
 // MARK: Words
 
@@ -52,6 +53,30 @@ let gratitude: [String] = [
 
 let secondsPerLine: Double = 10
 
+// MARK: Fonts
+
+enum Face: String, CaseIterable {
+    case bebas = "Bebas Neue", playfair = "Playfair Display", cormorant = "Cormorant Garamond", system = "SF Pro"
+    func font(_ scale: Double) -> Font {
+        switch self {
+        case .bebas:     return .custom("BebasNeue-Regular", size: 52 * scale)
+        case .playfair:  return .custom("PlayfairDisplay-Italic", size: 34 * scale)
+        case .cormorant: return .custom("Cormorant Garamond", size: 40 * scale).italic().weight(.medium)
+        case .system:    return .system(size: 30 * scale, weight: .semibold, design: .default)
+        }
+    }
+    var tracking: CGFloat { self == .bebas ? 1.5 : 0 }
+    var lineSpacing: CGFloat { self == .bebas ? -2 : 4 }
+}
+
+func registerFonts() {
+    guard let dir = Bundle.main.resourceURL,
+          let files = try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil) else { return }
+    for url in files where url.pathExtension.lowercased() == "ttf" {
+        CTFontManagerRegisterFontsForURL(url as CFURL, .process, nil)
+    }
+}
+
 // MARK: App
 
 @main
@@ -60,104 +85,119 @@ struct FaceItApp: App {
     var body: some Scene { Settings { EmptyView() } }
 }
 
-enum Spot: String, CaseIterable {
-    case topRight = "Top right", topLeft = "Top left", center = "Center",
-         bottomRight = "Bottom right", bottomLeft = "Bottom left"
+extension Notification.Name { static let nextQuote = Notification.Name("FaceItNextQuote") }
+
+// Transparent layer on top: drag moves the window, a plain click shows the next quote.
+final class DragView: NSView {
+    override func hitTest(_ point: NSPoint) -> NSView? { frame.contains(point) ? self : nil }
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+    override func mouseDown(with event: NSEvent) {
+        guard let w = window else { return }
+        let before = w.frame.origin
+        w.performDrag(with: event)
+        let after = w.frame.origin
+        if abs(after.x - before.x) < 2 && abs(after.y - before.y) < 2 {
+            NotificationCenter.default.post(name: .nextQuote, object: nil)
+        } else {
+            UserDefaults.standard.set(NSStringFromPoint(after), forKey: "origin")
+        }
+    }
+    override func resetCursorRects() { addCursorRect(bounds, cursor: .openHand) }
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     var window: NSWindow!
     var statusItem: NSStatusItem!
-    let w: CGFloat = 560, h: CGFloat = 240
+    let w: CGFloat = 640, h: CGFloat = 280
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        NSApp.setActivationPolicy(.accessory)   // no Dock icon
+        NSApp.setActivationPolicy(.accessory)
+        registerFonts()
 
         window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: w, height: h),
                           styleMask: [.borderless], backing: .buffered, defer: false)
         window.isOpaque = false
         window.backgroundColor = .clear
         window.hasShadow = false
-        window.ignoresMouseEvents = true
-        window.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.desktopIconWindow)))
+        window.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.desktopIconWindow)) + 1)
         window.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle]
-        window.contentView = NSHostingView(rootView: QuoteView())
+
+        let root = NSView(frame: NSRect(x: 0, y: 0, width: w, height: h))
+        let host = NSHostingView(rootView: QuoteView())
+        host.frame = root.bounds
+        host.autoresizingMask = [.width, .height]
+        let drag = DragView(frame: root.bounds)
+        drag.autoresizingMask = [.width, .height]
+        root.addSubview(host)
+        root.addSubview(drag)
+        window.contentView = root
         place()
         window.orderFront(nil)
 
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         statusItem.button?.title = "\u{201C}"
         buildMenu()
-
-        NotificationCenter.default.addObserver(self, selector: #selector(place),
-            name: NSApplication.didChangeScreenParametersNotification, object: nil)
     }
 
-    var spot: Spot {
-        get { Spot(rawValue: UserDefaults.standard.string(forKey: "spot") ?? "") ?? .topRight }
-        set { UserDefaults.standard.set(newValue.rawValue, forKey: "spot"); place(); buildMenu() }
-    }
-
-    @objc func place() {
-        guard let s = NSScreen.main?.visibleFrame else { return }
-        let m: CGFloat = 40
-        let x: CGFloat, y: CGFloat
-        switch spot {
-        case .topRight:    x = s.maxX - w - m; y = s.maxY - h - m
-        case .topLeft:     x = s.minX + m;     y = s.maxY - h - m
-        case .center:      x = s.midX - w / 2; y = s.midY - h / 2
-        case .bottomRight: x = s.maxX - w - m; y = s.minY + m
-        case .bottomLeft:  x = s.minX + m;     y = s.minY + m
+    func place() {
+        if let s = UserDefaults.standard.string(forKey: "origin") {
+            let p = NSPointFromString(s)
+            if NSScreen.screens.contains(where: { $0.frame.contains(NSPoint(x: p.x + 20, y: p.y + 20)) }) {
+                window.setFrameOrigin(p); return
+            }
         }
-        window.setFrame(NSRect(x: x, y: y, width: w, height: h), display: true)
+        guard let v = NSScreen.main?.visibleFrame else { return }
+        window.setFrameOrigin(NSPoint(x: v.maxX - w - 40, y: v.maxY - h - 40))
+    }
+
+    func header(_ t: String, _ m: NSMenu) {
+        let i = NSMenuItem(title: t, action: nil, keyEquivalent: ""); i.isEnabled = false; m.addItem(i)
     }
 
     func buildMenu() {
+        let d = UserDefaults.standard
         let menu = NSMenu()
-        let posTitle = NSMenuItem(title: "Position", action: nil, keyEquivalent: "")
-        posTitle.isEnabled = false
-        menu.addItem(posTitle)
-        for s in Spot.allCases {
-            let item = NSMenuItem(title: s.rawValue, action: #selector(pickSpot(_:)), keyEquivalent: "")
-            item.target = self
-            item.representedObject = s.rawValue
-            item.state = s == spot ? .on : .off
-            menu.addItem(item)
+        let next = NSMenuItem(title: "Next quote", action: #selector(nextQuote), keyEquivalent: "n")
+        next.target = self; menu.addItem(next)
+        menu.addItem(.separator())
+        header("Font", menu)
+        let face = d.string(forKey: "face") ?? Face.bebas.rawValue
+        for f in Face.allCases {
+            let i = NSMenuItem(title: f.rawValue, action: #selector(pickFace(_:)), keyEquivalent: "")
+            i.target = self; i.representedObject = f.rawValue; i.state = f.rawValue == face ? .on : .off
+            menu.addItem(i)
         }
         menu.addItem(.separator())
-        let sizeTitle = NSMenuItem(title: "Text size", action: nil, keyEquivalent: "")
-        sizeTitle.isEnabled = false
-        menu.addItem(sizeTitle)
-        let current = UserDefaults.standard.object(forKey: "size") as? Double ?? 26
-        for (name, value) in [("Small", 20.0), ("Medium", 26.0), ("Large", 34.0)] {
-            let item = NSMenuItem(title: name, action: #selector(pickSize(_:)), keyEquivalent: "")
-            item.target = self
-            item.representedObject = value
-            item.state = value == current ? .on : .off
-            menu.addItem(item)
+        header("Size", menu)
+        let cur = d.object(forKey: "scale") as? Double ?? 1.0
+        for (n, v) in [("Small", 0.75), ("Medium", 1.0), ("Large", 1.3)] {
+            let i = NSMenuItem(title: n, action: #selector(pickScale(_:)), keyEquivalent: "")
+            i.target = self; i.representedObject = v; i.state = v == cur ? .on : .off
+            menu.addItem(i)
         }
         menu.addItem(.separator())
+        let reset = NSMenuItem(title: "Reset position", action: #selector(resetPosition), keyEquivalent: "")
+        reset.target = self; menu.addItem(reset)
         menu.addItem(NSMenuItem(title: "Quit Face It", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
         statusItem.menu = menu
     }
 
-    @objc func pickSpot(_ sender: NSMenuItem) {
-        if let raw = sender.representedObject as? String, let s = Spot(rawValue: raw) { spot = s }
-    }
-    @objc func pickSize(_ sender: NSMenuItem) {
-        if let v = sender.representedObject as? Double { UserDefaults.standard.set(v, forKey: "size"); buildMenu() }
-    }
+    @objc func nextQuote() { NotificationCenter.default.post(name: .nextQuote, object: nil) }
+    @objc func pickFace(_ s: NSMenuItem) { UserDefaults.standard.set(s.representedObject as? String, forKey: "face"); buildMenu() }
+    @objc func pickScale(_ s: NSMenuItem) { if let v = s.representedObject as? Double { UserDefaults.standard.set(v, forKey: "scale"); buildMenu() } }
+    @objc func resetPosition() { UserDefaults.standard.removeObject(forKey: "origin"); place() }
 }
 
 // MARK: View
 
 struct QuoteView: View {
-    @AppStorage("size") private var size: Double = 26
+    @AppStorage("face") private var faceRaw: String = Face.bebas.rawValue
+    @AppStorage("scale") private var scale: Double = 1.0
     @State private var lines: [String] = Self.mixed()
     @State private var i = 0
+    @State private var tick = 0
     private let timer = Timer.publish(every: secondsPerLine, on: .main, in: .common).autoconnect()
 
-    // Shuffled, alternating affirmation and gratitude.
     static func mixed() -> [String] {
         let a = affirmations.shuffled(), g = gratitude.shuffled()
         var out: [String] = []
@@ -168,23 +208,32 @@ struct QuoteView: View {
         return out
     }
 
+    func advance() {
+        withAnimation(.easeInOut(duration: 1.1)) {
+            if i + 1 < lines.count { i += 1 } else { lines = Self.mixed(); i = 0 }
+        }
+    }
+
     var body: some View {
+        let face = Face(rawValue: faceRaw) ?? .bebas
         ZStack {
             Text("\u{201C}\(lines[i])\u{201D}")
-                .font(.system(size: size, weight: .semibold))
+                .font(face.font(scale))
+                .tracking(face.tracking)
+                .lineSpacing(face.lineSpacing)
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
-                .minimumScaleFactor(0.5)
-                .shadow(color: .black.opacity(0.55), radius: 8, y: 2)
-                .padding(20)
+                .minimumScaleFactor(0.4)
+                .shadow(color: .black.opacity(0.35), radius: 1, y: 1)
+                .shadow(color: .black.opacity(0.45), radius: 18, y: 4)
+                .padding(24)
                 .id(i)
-                .transition(.opacity)
+                .transition(.asymmetric(
+                    insertion: .opacity.combined(with: .offset(y: 8)).combined(with: .scale(scale: 0.98)),
+                    removal: .opacity.combined(with: .offset(y: -8))))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .onReceive(timer) { _ in
-            withAnimation(.easeInOut(duration: 1.2)) {
-                if i + 1 < lines.count { i += 1 } else { lines = Self.mixed(); i = 0 }
-            }
-        }
+        .onReceive(timer) { _ in advance() }
+        .onReceive(NotificationCenter.default.publisher(for: .nextQuote)) { _ in advance() }
     }
 }

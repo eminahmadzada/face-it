@@ -14,7 +14,10 @@ curl -fsSL "https://raw.githubusercontent.com/eminahmadzada/face-it/main/mac-app
 APP="$HOME/Applications/FaceIt.app"
 pkill -x FaceIt 2>/dev/null || true
 rm -rf "$APP"
-mkdir -p "$APP/Contents/MacOS"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+for f in BebasNeue-Regular.ttf PlayfairDisplay-Italic.ttf CormorantGaramond-Italic.ttf OFL.txt; do
+  curl -fsSL "https://raw.githubusercontent.com/eminahmadzada/face-it/main/mac-app/fonts/$f" -o "$APP/Contents/Resources/$f"
+done
 xcrun swiftc -O -parse-as-library -target "$(uname -m)-apple-macos13" "$TMP/FaceItApp.swift" -o "$APP/Contents/MacOS/FaceIt"
 cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
