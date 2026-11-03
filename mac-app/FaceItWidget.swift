@@ -96,7 +96,7 @@ let green = Color(red: 0.404, green: 0.875, blue: 0.439)
 let soft = Color(red: 0.902, green: 0.910, blue: 0.929)
 let muted = Color(red: 0.545, green: 0.580, blue: 0.620)
 
-struct Label: View {
+struct Tag: View {
     let text: String
     let color: Color
     var body: some View {
@@ -112,7 +112,7 @@ struct AffirmationBlock: View {
     var size: CGFloat
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Label(text: "I am", color: green)
+            Tag(text: "I am", color: green)
             Text(entry.affirmation)
                 .font(.system(size: size, weight: .semibold))
                 .foregroundStyle(soft)
@@ -128,7 +128,7 @@ struct GratitudeBlock: View {
     var size: CGFloat
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Label(text: "Alhamdulillah", color: muted)
+            Tag(text: "Alhamdulillah", color: muted)
             Text(entry.grat.0)
                 .font(.system(size: size, weight: .medium))
                 .foregroundStyle(soft)
