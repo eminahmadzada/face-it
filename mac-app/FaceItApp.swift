@@ -26,30 +26,30 @@ let affirmations: [String] = [
     "I am enough, and my worth is not tied to external achievements."
 ]
 
-let gratitude: [String] = [
-    "If you are grateful, I will surely give you more.",
-    "So remember Me, I will remember you. Be grateful to Me and do not deny Me.",
-    "So which of the favours of your Lord would you deny?",
-    "If you tried to count the blessings of Allah, you could never number them.",
-    "Whoever is grateful, is grateful for the good of his own soul.",
-    "My Lord, enable me to be grateful for the favour You have given me and my parents, and to do good that pleases You.",
-    "Indeed, with hardship comes ease.",
-    "A person will have nothing except what he strives for.",
-    "Allah does not change the condition of a people until they change what is in themselves.",
-    "Once you have decided, put your trust in Allah.",
-    "Whoever puts his trust in Allah, He is enough for him.",
-    "Allah does not burden a soul beyond what it can bear.",
-    "We made you into nations and tribes so that you may know one another.",
-    "And speak good words to people.",
-    "Whoever does not thank people has not thanked Allah.",
-    "How wonderful is the affair of the believer. If good comes to him, he is grateful, and that is good for him. If hardship comes, he is patient, and that is good for him.",
-    "Look at those below you and not at those above you, so you do not belittle the blessings of Allah upon you.",
-    "The strong believer is better and more beloved to Allah than the weak believer. Strive for what benefits you, seek help from Allah, and do not give up.",
-    "Allah loves that when one of you does a job, he does it with excellence.",
-    "The best of people are those most beneficial to people.",
-    "Your smile in the face of your brother is charity.",
-    "Tie your camel, then put your trust in Allah.",
-    "Alhamdulillah ala kulli hal. Praise be to Allah in every situation."
+let gratitude: [(String, String)] = [
+    ("If you are grateful, I will surely give you more.", "Quran 14:7"),
+    ("So remember Me, I will remember you. Be grateful to Me and do not deny Me.", "Quran 2:152"),
+    ("So which of the favours of your Lord would you deny?", "Quran 55:13"),
+    ("If you tried to count the blessings of Allah, you could never number them.", "Quran 14:34"),
+    ("Whoever is grateful, is grateful for the good of his own soul.", "Quran 31:12"),
+    ("My Lord, enable me to be grateful for the favour You have given me and my parents, and to do good that pleases You.", "Quran 27:19"),
+    ("Indeed, with hardship comes ease.", "Quran 94:6"),
+    ("A person will have nothing except what he strives for.", "Quran 53:39"),
+    ("Allah does not change the condition of a people until they change what is in themselves.", "Quran 13:11"),
+    ("Once you have decided, put your trust in Allah.", "Quran 3:159"),
+    ("Whoever puts his trust in Allah, He is enough for him.", "Quran 65:3"),
+    ("Allah does not burden a soul beyond what it can bear.", "Quran 2:286"),
+    ("We made you into nations and tribes so that you may know one another.", "Quran 49:13"),
+    ("And speak good words to people.", "Quran 2:83"),
+    ("Whoever does not thank people has not thanked Allah.", "Hadith, Abu Dawud and Tirmidhi"),
+    ("How wonderful is the affair of the believer. If good comes to him, he is grateful, and that is good for him. If hardship comes, he is patient, and that is good for him.", "Hadith, Sahih Muslim"),
+    ("Look at those below you and not at those above you, so you do not belittle the blessings of Allah upon you.", "Hadith, Sahih Muslim"),
+    ("The strong believer is better and more beloved to Allah than the weak believer. Strive for what benefits you, seek help from Allah, and do not give up.", "Hadith, Sahih Muslim"),
+    ("Allah loves that when one of you does a job, he does it with excellence.", "Hadith, al Bayhaqi"),
+    ("The best of people are those most beneficial to people.", "Hadith, al Tabarani"),
+    ("Your smile in the face of your brother is charity.", "Hadith, Tirmidhi"),
+    ("Tie your camel, then put your trust in Allah.", "Hadith, Tirmidhi"),
+    ("Alhamdulillah ala kulli hal. Praise be to Allah in every situation.", "Hadith, Ibn Majah")
 ]
 
 let secondsPerLine: Double = 10
@@ -247,16 +247,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 // MARK: View
 
+struct Quote { let text: String; let source: String? }
+
 struct QuoteView: View {
     @AppStorage("face2") private var faceRaw: String = Face.bebas.rawValue
     @AppStorage("quotes") private var quotes: Bool = false
-    @State private var lines: [String] = Self.mixed()
+    @State private var lines: [Quote] = Self.mixed()
     @State private var i = 0
     private let timer = Timer.publish(every: secondsPerLine, on: .main, in: .common).autoconnect()
+    private let green = Color(red: 0.404, green: 0.875, blue: 0.439)
 
-    static func mixed() -> [String] {
-        let a = affirmations.shuffled(), g = gratitude.shuffled()
-        var out: [String] = []
+    static func mixed() -> [Quote] {
+        let a = affirmations.shuffled().map { Quote(text: $0, source: nil) }
+        let g = gratitude.shuffled().map { Quote(text: $0.0, source: $0.1) }
+        var out: [Quote] = []
         for k in 0..<max(a.count, g.count) {
             if k < a.count { out.append(a[k]) }
             if k < g.count { out.append(g[k]) }
@@ -272,27 +276,39 @@ struct QuoteView: View {
 
     var body: some View {
         let face = Face(rawValue: faceRaw) ?? .bebas
-        let line = lines[i]
-        let text = quotes ? "\"\(line)\"" : line
+        let q = lines[i]
+        let text = quotes ? "\"\(q.text)\"" : q.text
         GeometryReader { geo in
             let pad: CGFloat = 18
-            let area = max(1, (geo.size.width - pad * 2) * (geo.size.height - pad * 2))
-            let size = min(geo.size.height * 0.45, face.fill * sqrt(area / CGFloat(max(12, text.count))))
+            let textH = geo.size.height - pad * 2 - (q.source == nil ? 0 : geo.size.height * 0.16)
+            let area = max(1, (geo.size.width - pad * 2) * max(1, textH))
+            let size = min(textH * 0.5, face.fill * sqrt(area / CGFloat(max(12, text.count))))
+            let srcSize = max(12, min(size * 0.38, geo.size.height * 0.1))
             ZStack {
-                Text(text)
-                    .font(face.font(size))
-                    .tracking(face.tracking)
-                    .lineSpacing(face.lineSpacing)
-                    .foregroundStyle(.white)
-                    .multilineTextAlignment(.center)
-                    .minimumScaleFactor(0.3)
-                    .shadow(color: .black.opacity(0.35), radius: 1, y: 1)
-                    .shadow(color: .black.opacity(0.45), radius: 18, y: 4)
-                    .padding(pad)
-                    .id(i)
-                    .transition(.asymmetric(
-                        insertion: .opacity.combined(with: .offset(y: 8)),
-                        removal: .opacity.combined(with: .offset(y: -8))))
+                VStack(spacing: max(6, size * 0.22)) {
+                    Text(text)
+                        .font(face.font(size))
+                        .tracking(face.tracking)
+                        .lineSpacing(face.lineSpacing)
+                        .foregroundStyle(.white)
+                        .minimumScaleFactor(0.3)
+                    if let src = q.source {
+                        Text(src)
+                            .font(face.font(srcSize))
+                            .tracking(face.tracking + 0.5)
+                            .foregroundStyle(green)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
+                    }
+                }
+                .multilineTextAlignment(.center)
+                .shadow(color: .black.opacity(0.35), radius: 1, y: 1)
+                .shadow(color: .black.opacity(0.45), radius: 18, y: 4)
+                .padding(pad)
+                .id(i)
+                .transition(.asymmetric(
+                    insertion: .opacity.combined(with: .offset(y: 8)),
+                    removal: .opacity.combined(with: .offset(y: -8))))
             }
             .frame(width: geo.size.width, height: geo.size.height)
         }
