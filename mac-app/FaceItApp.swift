@@ -7,32 +7,21 @@ import AppKit
 // MARK: Words
 
 let affirmations: [String] = [
-    "I am very capable and clever. I learn fast and I solve hard problems.",
-    "My mind is sharp. I see the answer others miss.",
-    "I trust my judgement. I earned it through years of hard work.",
-    "I can figure out anything I put my mind to.",
-    "I bring real value to my colleagues and my employer every single day.",
-    "I make my partner's life better. I am her calm, her strength and her safe place.",
-    "My family is proud of me, and I make them prouder every year.",
-    "People are better off after working with me.",
-    "My work matters, and the people around me feel it.",
-    "I walk into every room calm, confident and ready.",
-    "Pressure makes me focused, not afraid.",
-    "I do not need anyone's permission to be great.",
-    "I am proud of who I am and who I am becoming.",
-    "I speak clearly and with confidence. People listen when I talk.",
-    "I make complex things simple. That is my gift.",
-    "I listen deeply, and people feel understood around me.",
-    "I say what I think, kindly and directly.",
-    "I enjoy meeting new people, and they enjoy meeting me.",
-    "I connect people and ideas. Doors open because of the bridges I build.",
-    "I remember people, I follow up, and I keep my relationships warm.",
-    "I give before I ask, and my network grows every week.",
-    "I always achieve what I plan, because I work hard and I do not quit.",
-    "When I decide, I deliver.",
-    "Every small win today builds the big win I am working for.",
-    "Hard work is my edge, and I never run out of it.",
-    "Success is my normal. I build it one day at a time."
+    "I am worthy of success and happiness.",
+    "I am capable of achieving my goals.",
+    "I am grateful for the abundance in my life.",
+    "I embrace challenges as opportunities to grow.",
+    "I am in control of my destiny.",
+    "I believe in myself.",
+    "I attract success and prosperity.",
+    "I am confident in my abilities and decisions.",
+    "I am open to new possibilities and opportunities.",
+    "I am resilient and can overcome any obstacle.",
+    "Every effort I make moves me closer to my goals.",
+    "I confidently take risks that lead to success.",
+    "When I feel fear, I face it and fight it to win.",
+    "Every challenge I overcome strengthens my path to success.",
+    "I am enough, and my worth is not tied to external achievements."
 ]
 
 let gratitude: [String] = [
