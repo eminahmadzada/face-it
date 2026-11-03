@@ -1,5 +1,5 @@
 // Face It for Mac.
-// One quote on your desktop, behind your windows, changing every 10 seconds.
+// One quote on your desktop, behind your windows, changing every 20 seconds.
 // Drag the middle to move it. Drag an edge or corner to resize it (the text grows with it).
 // Click it for the next quote. Menu bar icon: font, quote marks, reset, quit.
 import SwiftUI
@@ -52,7 +52,7 @@ let gratitude: [(String, String)] = [
     ("Alhamdulillah ala kulli hal. Praise be to Allah in every situation.", "Hadith, Ibn Majah")
 ]
 
-let secondsPerLine: Double = 10
+let secondsPerLine: Double = 20
 
 // MARK: Fonts
 
