@@ -1,0 +1,78 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0B0E13"><title>Face It Words</title><link rel="icon" href="icon.svg">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}html,body{background:#0B0E13;color:#E6E8ED;font:15px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,sans-serif;-webkit-font-smoothing:antialiased;height:100%}
+body{display:flex;flex-direction:column;gap:12px;padding:14px;justify-content:center}
+.c{background:#161A20;border:1px solid #2A2F37;border-radius:18px;padding:18px 20px;cursor:pointer;user-select:none}
+.l{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8B949E}.l.g{color:#67DF70}
+.q{font-size:19px;font-weight:600;line-height:1.35;margin-top:8px}.q2{font-size:17px;font-weight:500}
+.s{color:#67DF70;font-size:12px;font-weight:600;margin-top:8px}
+</style></head><body>
+<div class="c" id="a"><div class="l g">I am</div><div class="q" id="aq"></div></div>
+<div class="c" id="g"><div class="l">Alhamdulillah</div><div class="q q2" id="gq"></div><div class="s" id="gs"></div></div>
+<script>
+const AFF=[
+ ['Capable',[
+  'I am very capable and clever. I learn fast and I solve hard problems.',
+  'My mind is sharp. I see the answer others miss.',
+  'I trust my judgement. I earned it through years of hard work.',
+  'I can figure out anything I put my mind to.']],
+ ['Value',[
+  'I bring real value to my colleagues and my employer every single day.',
+  'I make my partner\'s life better. I am her calm, her strength and her safe place.',
+  'My family is proud of me, and I make them prouder every year.',
+  'People are better off after working with me.',
+  'My work matters, and the people around me feel it.']],
+ ['Confidence',[
+  'I walk into every room calm, confident and ready.',
+  'Pressure makes me focused, not afraid.',
+  'I do not need anyone\'s permission to be great.',
+  'I am proud of who I am and who I am becoming.']],
+ ['Communication',[
+  'I speak clearly and with confidence. People listen when I talk.',
+  'I make complex things simple. That is my gift.',
+  'I listen deeply, and people feel understood around me.',
+  'I say what I think, kindly and directly.']],
+ ['Connection',[
+  'I enjoy meeting new people, and they enjoy meeting me.',
+  'I connect people and ideas. Doors open because of the bridges I build.',
+  'I remember people, I follow up, and I keep my relationships warm.',
+  'I give before I ask, and my network grows every week.']],
+ ['Achievement',[
+  'I always achieve what I plan, because I work hard and I do not quit.',
+  'When I decide, I deliver.',
+  'Every small win today builds the big win I am working for.',
+  'Hard work is my edge, and I never run out of it.',
+  'Success is my normal. I build it one day at a time.']]
+];
+const GRAT=[
+ ['If you are grateful, I will surely give you more.','Quran 14:7'],
+ ['So remember Me, I will remember you. Be grateful to Me and do not deny Me.','Quran 2:152'],
+ ['So which of the favours of your Lord would you deny?','Quran 55:13'],
+ ['If you tried to count the blessings of Allah, you could never number them.','Quran 14:34'],
+ ['Whoever is grateful, is grateful for the good of his own soul.','Quran 31:12'],
+ ['My Lord, enable me to be grateful for the favour You have given me and my parents, and to do good that pleases You.','Quran 27:19'],
+ ['Indeed, with hardship comes ease.','Quran 94:6'],
+ ['A person will have nothing except what he strives for.','Quran 53:39'],
+ ['Allah does not change the condition of a people until they change what is in themselves.','Quran 13:11'],
+ ['Once you have decided, put your trust in Allah.','Quran 3:159'],
+ ['Whoever puts his trust in Allah, He is enough for him.','Quran 65:3'],
+ ['Allah does not burden a soul beyond what it can bear.','Quran 2:286'],
+ ['We made you into nations and tribes so that you may know one another.','Quran 49:13'],
+ ['And speak good words to people.','Quran 2:83'],
+ ['Whoever does not thank people has not thanked Allah.','Hadith, Abu Dawud and Tirmidhi'],
+ ['How wonderful is the affair of the believer. If good comes to him, he is grateful, and that is good for him. If hardship comes, he is patient, and that is good for him.','Hadith, Sahih Muslim'],
+ ['Look at those below you and not at those above you, so you do not belittle the blessings of Allah upon you.','Hadith, Sahih Muslim'],
+ ['The strong believer is better and more beloved to Allah than the weak believer. Strive for what benefits you, seek help from Allah, and do not give up.','Hadith, Sahih Muslim'],
+ ['Allah loves that when one of you does a job, he does it with excellence.','Hadith, al Bayhaqi'],
+ ['The best of people are those most beneficial to people.','Hadith, al Tabarani'],
+ ['Your smile in the face of your brother is charity.','Hadith, Tirmidhi'],
+ ['Tie your camel, then put your trust in Allah.','Hadith, Tirmidhi'],
+ ['Alhamdulillah ala kulli hal. Praise be to Allah in every situation.','Hadith, Ibn Majah']
+];
+const A=AFF.flatMap(x=>x[1]);const d=()=>Math.floor((new Date().setHours(0,0,0,0)-new Date(2026,0,1))/864e5);
+const o={a:0,g:0};const m=(i,n)=>((i%n)+n)%n;
+function r(){document.getElementById('aq').textContent=A[m(d()+o.a,A.length)];const g=GRAT[m(d()+o.g,GRAT.length)];document.getElementById('gq').textContent=g[0];document.getElementById('gs').textContent=g[1];}
+document.getElementById('a').onclick=()=>{o.a++;r()};document.getElementById('g').onclick=()=>{o.g++;r()};
+r();setInterval(r,36e5);
+</script></body></html>
