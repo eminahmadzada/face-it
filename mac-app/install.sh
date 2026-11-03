@@ -10,13 +10,13 @@ if ! xcrun --find swiftc >/dev/null 2>&1; then
 fi
 echo "Building Face It..."
 TMP=$(mktemp -d)
-curl -fsSL "https://raw.githubusercontent.com/eminahmadzada/face-it/main/mac-app/FaceItApp.swift?$(date +%s)" -o "$TMP/FaceItApp.swift"
+curl -fsSL "https://raw.githubusercontent.com/eminahmadzada/face-it/8ff2892/mac-app/FaceItApp.swift?$(date +%s)" -o "$TMP/FaceItApp.swift"
 APP="$HOME/Applications/FaceIt.app"
 pkill -x FaceIt 2>/dev/null || true
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 for f in BebasNeue-Regular.ttf PlayfairDisplay-Italic.ttf CormorantGaramond-Italic.ttf OFL.txt; do
-  curl -fsSL "https://raw.githubusercontent.com/eminahmadzada/face-it/main/mac-app/fonts/$f" -o "$APP/Contents/Resources/$f"
+  curl -fsSL "https://raw.githubusercontent.com/eminahmadzada/face-it/8ff2892/mac-app/fonts/$f" -o "$APP/Contents/Resources/$f"
 done
 xcrun swiftc -O -parse-as-library -target "$(uname -m)-apple-macos13" "$TMP/FaceItApp.swift" -o "$APP/Contents/MacOS/FaceIt"
 cat > "$APP/Contents/Info.plist" <<PLIST
